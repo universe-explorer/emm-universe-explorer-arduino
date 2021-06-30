@@ -3,6 +3,7 @@
 
 #include <Ewma.h> //https://github.com/jonnieZG/EWMA
 #define MPU6050_ADRESS 0x68
+#define BTN_PIN 2
 
 static const double ACC_RATE = 16384.0;
 static const double GYRO_RATE = 131.0;
@@ -117,7 +118,7 @@ void *calculate_angles() {
     pitch_raw = pitch_filter.filter(pitch_raw);
     pitch = mapDouble(pitch_raw, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
     pitch = constrain(pitch, -map_to, map_to);
-
+    pitch *= -1;
 
     if (abs(roll) < 0.1) {
         roll = 0;
@@ -147,6 +148,7 @@ void *calculate_angles() {
 
 
     if (print) {
+
         Serial.print("roll:");
         Serial.print(roll);
         Serial.print(" \t");
@@ -155,6 +157,9 @@ void *calculate_angles() {
         Serial.print(" \t");
         Serial.print("yaw:");
         Serial.print(yaw);
+        Serial.print(" \t");
+        Serial.print("btn:");
+        Serial.print(get_btn_state());
         Serial.println(" \t");
     }
 
@@ -196,6 +201,9 @@ void calculate_offsets() {
 
 }
 
+bool get_btn_state() {
+    return digitalRead(BTN_PIN) == 0;
+}
 
 void setup() {
     Wire.begin();
@@ -206,6 +214,8 @@ void setup() {
 
     Serial.begin(9600);
     Serial.flush();
+
+    pinMode(BTN_PIN, INPUT);
 
     calculate_offsets();
 }
