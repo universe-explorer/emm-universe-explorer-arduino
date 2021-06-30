@@ -14,6 +14,7 @@ unsigned long preInterval;
 double roll = 0;
 double pitch = 0;
 double yaw = 0, yaw_ = 0;
+bool btn_state = false;
 
 //Ewma smoothing library
 Ewma roll_filter(0.1);
@@ -99,14 +100,14 @@ double *get_sensor_data() {
 void *calculate_angles() {
     double *sensor_data = get_sensor_data();
 
-    static const float boarder_roll_pitch = 2.0;  //upper_lower boarder_roll_pitch for roll and pitch
     static const double boarder_yaw = 4.5;  //upper_lower boarder_roll_pitch for roll and pitch
 
     static const double map_to = 1.0;
+
     double roll_raw = sensor_data[0] - offsets[0];
     double pitch_raw = sensor_data[1] - offsets[1];
 
-    set_roll_pitch_bounds(roll_raw, pitch_raw);
+
 
 
     //roll
@@ -142,26 +143,20 @@ void *calculate_angles() {
     yaw = mapDouble(yaw_, -boarder_yaw, boarder_yaw, -map_to, map_to);
     yaw = constrain(yaw, -map_to, map_to);
 
+    //btn state
+    btn_state = get_btn_state();
+
+
+
     bool print;
     print = false;
     print = true;
 
-
-    if (print) {
-
-        Serial.print("roll:");
-        Serial.print(roll);
-        Serial.print(" \t");
-        Serial.print("pitch:");
-        Serial.print(pitch);
-        Serial.print(" \t");
-        Serial.print("yaw:");
-        Serial.print(yaw);
-        Serial.print(" \t");
-        Serial.print("btn:");
-        Serial.print(get_btn_state());
-        Serial.println(" \t");
+    if(print) {
+        print_data(roll, pitch, yaw, btn_state);
     }
+
+    //serialize_data(roll, pitch, yaw, btn_state);
 
 }
 
@@ -203,6 +198,30 @@ void calculate_offsets() {
 
 bool get_btn_state() {
     return digitalRead(BTN_PIN) == 0;
+}
+
+
+void print_data(double roll, double pitch, double yaw, bool btn_state) {
+        Serial.print("roll:");
+        Serial.print(roll);
+        Serial.print(" \t");
+        Serial.print("pitch:");
+        Serial.print(pitch);
+        Serial.print(" \t");
+        Serial.print("yaw:");
+        Serial.print(yaw);
+        Serial.print(" \t");
+        Serial.print("btn:");
+        Serial.print(btn_state);
+        Serial.println(" \t");
+}
+
+void serialize_data(double roll, double pitch, double yaw, bool btn) {
+
+}
+
+void send_data() {
+    return ;
 }
 
 void setup() {
