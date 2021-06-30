@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#include <Ewma.h> //https://github.com/jonnieZG/EWMA
 #define MPU6050_ADRESS 0x68
 
 static const double ACC_RATE = 16384.0;
@@ -12,6 +13,16 @@ unsigned long preInterval;
 double roll = 0;
 double pitch = 0;
 double yaw = 0, yaw_ = 0;
+
+//Ewma smoothing library
+Ewma roll_filter(0.1);
+Ewma pitch_filter(0.1);
+
+
+double roll_lower_boarder = 1;
+double roll_upper_boarder = -1;
+double pitch_lower_boarder = 1;
+double pitch_upper_boarder = -1;
 
 /* helper functions */
 double _max = 0, _min = 0;
@@ -26,23 +37,23 @@ double mapDouble(double x, double in_min, double in_max, double out_min, double 
 
 
 /**
- * prints minimal and maximal recorded value
+ * sets lower and upper boarders for roll and pitch, used to map values to certain range
  * @param val
  */
-void get_min_max(double val) {
-    if (val > _max) {
-        _max = val;
+void set_roll_pitch_bounds(double roll_raw, double pitch_raw) {
+    if (roll_raw > roll_upper_boarder) {
+        roll_upper_boarder = roll_raw;
     }
-    if (val < _min) {
-        _min = val;
+    if (roll_raw < roll_lower_boarder) {
+        roll_lower_boarder = roll_raw;
     }
 
-
-    Serial.print("_max:");
-    Serial.print(_max);
-    Serial.print(" \t");
-    Serial.print("_min:");
-    Serial.println(_min);
+    if (pitch_raw > pitch_upper_boarder) {
+        pitch_upper_boarder = pitch_raw;
+    }
+    if (pitch_raw < pitch_lower_boarder) {
+        pitch_lower_boarder = pitch_raw;
+    }
 }
 
 
@@ -90,19 +101,28 @@ void *calculate_angles() {
     static const float boarder_roll_pitch = 2.0;  //upper_lower boarder_roll_pitch for roll and pitch
     static const double boarder_yaw = 4.5;  //upper_lower boarder_roll_pitch for roll and pitch
 
+    static const double map_to = 1.0;
+    double roll_raw = sensor_data[0] - offsets[0];
+    double pitch_raw = sensor_data[1] - offsets[1];
+
+    set_roll_pitch_bounds(roll_raw, pitch_raw);
+
+
     //roll
-    roll = mapDouble(sensor_data[0] - offsets[0], -boarder_roll_pitch, boarder_roll_pitch, -90, 90.0);
-    roll = constrain(roll, -90, 90);
+    roll_raw = roll_filter.filter(roll_raw);
+    roll = mapDouble(roll_raw, roll_lower_boarder, roll_upper_boarder, -map_to, map_to);
+    roll = constrain(roll, -map_to, map_to);
 
     //pitch
-    pitch = mapDouble(sensor_data[1] - offsets[1], -boarder_roll_pitch, boarder_roll_pitch, -90, 90.0);
-    pitch = constrain(pitch, -90, 90);
+    pitch_raw = pitch_filter.filter(pitch_raw);
+    pitch = mapDouble(pitch_raw, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
+    pitch = constrain(pitch, -map_to, map_to);
 
 
-    if (roll > 0 && roll < 4) {
+    if (abs(roll) < 0.1) {
         roll = 0;
     }
-    if (pitch > 0 && pitch < 4) {
+    if (abs(pitch) < 0.1) {
         pitch = 0;
     }
 
@@ -114,16 +134,17 @@ void *calculate_angles() {
 
     double add_to_yaw = sensor_data[6] * dt;
 
-    if (abs(add_to_yaw) > 0.02) {
+    if (abs(add_to_yaw) > 0.02 && abs(yaw_ + add_to_yaw) < 1) {
         yaw_ += add_to_yaw;
     }
 
-    yaw = mapDouble(yaw_, -boarder_yaw, boarder_yaw, -45.0, 45.0);
-    yaw = constrain(yaw, -45, 45);
+    yaw = mapDouble(yaw_, -boarder_yaw, boarder_yaw, -map_to, map_to);
+    yaw = constrain(yaw, -map_to, map_to);
 
     bool print;
     print = false;
     print = true;
+
 
     if (print) {
         Serial.print("roll:");
