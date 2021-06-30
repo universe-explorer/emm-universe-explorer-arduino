@@ -108,18 +108,20 @@ void *calculate_angles() {
     double pitch_raw = sensor_data[1] - offsets[1];
 
 
-
-
     //roll
-    roll_raw = roll_filter.filter(roll_raw);
-    roll = mapDouble(roll_raw, roll_lower_boarder, roll_upper_boarder, -map_to, map_to);
+    double roll_smoothed = roll_filter.filter(roll_raw);
+    roll = mapDouble(roll_smoothed, roll_lower_boarder, roll_upper_boarder, -map_to, map_to);
     roll = constrain(roll, -map_to, map_to);
 
     //pitch
-    pitch_raw = pitch_filter.filter(pitch_raw);
-    pitch = mapDouble(pitch_raw, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
+    double pitch_smoothed = pitch_filter.filter(pitch_raw);
+    pitch = mapDouble(pitch_snoothed, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
     pitch = constrain(pitch, -map_to, map_to);
     pitch *= -1;
+
+
+    set_roll_pitch_bounds(roll_smoothed, pitch_smoothed);
+
 
     if (abs(roll) < 0.1) {
         roll = 0;
