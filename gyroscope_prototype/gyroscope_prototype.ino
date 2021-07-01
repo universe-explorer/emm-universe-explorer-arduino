@@ -138,7 +138,7 @@ void *calculate_angles() {
 
     double add_to_yaw = sensor_data[6] * dt;
 
-    if (abs(add_to_yaw) > 0.02 && abs(yaw_ + add_to_yaw) < 1) {
+    if (abs(add_to_yaw) > 0.02) {
         yaw_ += add_to_yaw;
     }
 
