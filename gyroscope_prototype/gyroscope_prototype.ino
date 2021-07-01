@@ -115,7 +115,7 @@ void *calculate_angles() {
 
     //pitch
     double pitch_smoothed = pitch_filter.filter(pitch_raw);
-    pitch = mapDouble(pitch_snoothed, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
+    pitch = mapDouble(pitch_smoothed, pitch_lower_boarder, pitch_upper_boarder, -map_to, map_to);
     pitch = constrain(pitch, -map_to, map_to);
     pitch *= -1;
 
@@ -123,10 +123,10 @@ void *calculate_angles() {
     set_roll_pitch_bounds(roll_smoothed, pitch_smoothed);
 
 
-    if (abs(roll) < 0.1) {
+    if (abs(roll) < 0.09) {
         roll = 0;
     }
-    if (abs(pitch) < 0.1) {
+    if (abs(pitch) < 0.09) {
         pitch = 0;
     }
 
