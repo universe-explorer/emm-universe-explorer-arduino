@@ -244,9 +244,6 @@ void print_data(double roll, double pitch, double yaw, bool btn_state) {
 }
 
 void serialize_data(double roll, double pitch, double yaw, bool btn) {
-        byte dataBuffer[bufferLength];
-
-        //convert values to bytes
         byte roll_converted = (int) (roll * 100) + 100;
         byte pitch_converted = (int) (pitch * 100) + 100;
         byte yaw_converted = (int) (yaw * 100) + 100;
@@ -256,22 +253,23 @@ void serialize_data(double roll, double pitch, double yaw, bool btn) {
         byte yaw_byte = byte(yaw_converted);
         byte btn_byte = byte(btn);
 
-        // write data
-        Serial.write(startByte);
-        Serial.write(bufferLength);
-
-        dataBuffer[0] = 0x01; // joystick byte
-        dataBuffer[1] = roll_byte; // roll value
-        dataBuffer[2] = pitch_byte; // pitch value
-        dataBuffer[3] = yaw_byte; // yaw value
-        dataBuffer[4] = btn_byte; // bool value
-
-        Serial.write(dataBuffer, bufferLength);
-        Serial.write(gencrc(dataBuffer, bufferLength));
+        send_data(roll_byte, pitch_byte, yaw_byte, btn_byte);
 }
 
-void send_data() {
-        return;
+void send_data(byte roll, byte pitch, byte yaw, byte btn) {
+    byte dataBuffer[bufferLength];
+
+    Serial.write(startByte);
+    Serial.write(bufferLength);
+
+    dataBuffer[0] = 0x01; // joystick byte
+    dataBuffer[1] = roll; // roll value
+    dataBuffer[2] = pitch; // pitch value
+    dataBuffer[3] = yaw; // yaw value
+    dataBuffer[4] = btn; // bool value
+
+    Serial.write(dataBuffer, bufferLength);
+    Serial.write(gencrc(dataBuffer, bufferLength));
 }
 
 void setup() {
