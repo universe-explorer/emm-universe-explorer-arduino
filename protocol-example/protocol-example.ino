@@ -6,7 +6,7 @@
 
 const byte startByte = 0xBE;
 const byte bufferLength = 2;
-byte dataBuffer[bufferLength];
+
 
 
 uint8_t gencrc(uint8_t *data, size_t len)
@@ -33,9 +33,11 @@ void setup() {
 
 void loop() {
 
+  byte dataBuffer[bufferLength];
+  
   Serial.write(startByte);
   Serial.write(bufferLength);
-
+  
   
   dataBuffer[0] = 0x00; // speed byte
   dataBuffer[1] = 0xFF; // speed value
