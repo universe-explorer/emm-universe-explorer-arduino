@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "gyroscope_prototype/gyroscope_prototype.ino",
+    "port": "/dev/tty.usbmodem144301"
+}
