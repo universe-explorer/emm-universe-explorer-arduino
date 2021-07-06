@@ -1,5 +1,5 @@
 /**
- * Usage of our protocol in a simple example
+ * Potentiometer
  * 
  * Info about the protocol structure is in our first presentation
  */
@@ -7,7 +7,7 @@
 const byte startByte = 0xBE;
 const byte bufferLength = 2;
 
-
+const int potentiometerPin = A0;
 
 uint8_t gencrc(uint8_t *data, size_t len)
 {
@@ -40,11 +40,14 @@ void loop() {
   
   
   dataBuffer[0] = 0x00; // speed byte
-  dataBuffer[1] = 0xFF; // speed value
+
+  int read = analogRead(potentiometerPin);
+  dataBuffer[1] = map(read, 0, 1023, 0, 255); // speed value
+  //Serial.println(dataBuffer[1]);
 
   Serial.write(dataBuffer, bufferLength);
 
-  //uint8_t crc = gencrc(dataBuffer, bufferLength);
+  uint8_t crc = gencrc(dataBuffer, bufferLength);
   Serial.write(gencrc(dataBuffer, bufferLength));
 
   delay(1);
