@@ -185,16 +185,13 @@ void *calculate_angles() { //todo remove return
   print = true;
   print = false;
 
-  if (print) {
-    print_data(roll, pitch, yaw, btn_state);
-  }
+  if (print) {  }
 
-  serialize_data(roll, pitch, yaw, btn_state);
+  print_data(roll, pitch, yaw, btn_state);
+
+  //serialize_data(roll, pitch, yaw, btn_state);
 
 }
-
-
-
 
 
 /**
@@ -209,8 +206,7 @@ void calculate_offsets() {
 
   double _offsets[6];
 
-  if (millis() > calibration_timeout + calibration_timer ) {
-    calibration_timeout = millis();
+  if (millis() > preInterval + calibration_timer ) {
 
     double *data = get_sensor_data();
 
@@ -304,16 +300,19 @@ void setup() {
 
 
 void loop() {
+
   if (calibration_rounds < calibration_reps) {
-    preInterval = millis();
+
     calculate_offsets();
+    preInterval = millis();
 
     send_data(byte(0), byte(0), byte(0), byte(0));
     calibration_rounds++;
 
   } else {
-    calculate_angles();
+    if (millis() > preInterval + 10 ) {
+      calculate_angles();
+      preInterval = millis();
+    }
   }
-
-  delay(10);
 }
