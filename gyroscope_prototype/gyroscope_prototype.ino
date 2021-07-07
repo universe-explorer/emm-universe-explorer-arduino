@@ -185,12 +185,11 @@ void *calculate_angles() { //todo remove return
   print = true;
   print = false;
 
-  if (print) {  }
+  if (print) {
+    print_data(roll, pitch, yaw, btn_state);
+  }
 
-  print_data(roll, pitch, yaw, btn_state);
-
-  //serialize_data(roll, pitch, yaw, btn_state);
-
+  serialize_data(roll, pitch, yaw, btn_state);
 }
 
 
