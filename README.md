@@ -7,3 +7,5 @@ Gyrosensor [Youtube]
 
 ![Yaw-Pitch-Roll](https://upload.wikimedia.org/wikipedia/commons/c/c1/Yaw_Axis_Corrected.svg)
 
+crc8 source: https://stackoverflow.com/a/51773839
+
