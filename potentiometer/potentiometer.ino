@@ -84,7 +84,6 @@ void setup() {
     for (;;); // Don't proceed, loop forever
   }
 
-  display.display();
 
 }
 
@@ -99,6 +98,24 @@ void loop() {
   dataBuffer[0] = 0x00; // speed byte
 
   int read = analogRead(potentiometerPin);
+
+
+
+
+  display.clearDisplay();
+  
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0,0);
+  display.print(F("Velocity: "));
+  display.println(read);
+  
+  display.fillRect(0, 20, (read/1023.f)*128, display.height()-40, SSD1306_WHITE);
+  
+  display.display();
+
+
+  
   dataBuffer[1] = map(read, 0, 1023, 0, 255); // speed value
   //Serial.println(dataBuffer[1]);
 
