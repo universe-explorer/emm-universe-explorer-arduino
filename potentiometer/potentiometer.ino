@@ -1,8 +1,39 @@
 /**
- * Potentiometer
- * 
- * Info about the protocol structure is in our first presentation
- */
+  Adafruit library:
+  Software License Agreement (BSD License)
+
+  Copyright (c) 2012, Adafruit Industries
+  All rights reserved.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+  1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  3. Neither the name of the copyright holders nor the
+  names of its contributors may be used to endorse or promote products
+  derived from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ''AS IS'' AND ANY
+  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
+  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+/**
+   Potentiometer
+
+   Info about the protocol structure is in our first presentation
+*/
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -28,18 +59,18 @@ const int potentiometerPin = A0;
 
 uint8_t gencrc(uint8_t *data, size_t len)
 {
-    uint8_t crc = 0;
-    size_t i, j;
-    for (i = 0; i < len; i++) {
-        crc ^= data[i];
-        for (j = 0; j < 8; j++) {
-            if ((crc & 0x80) != 0)
-                crc = (uint8_t)((crc << 1) ^ 0x15);
-            else
-                crc <<= 1;
-        }
+  uint8_t crc = 0;
+  size_t i, j;
+  for (i = 0; i < len; i++) {
+    crc ^= data[i];
+    for (j = 0; j < 8; j++) {
+      if ((crc & 0x80) != 0)
+        crc = (uint8_t)((crc << 1) ^ 0x15);
+      else
+        crc <<= 1;
     }
-    return crc;
+  }
+  return crc;
 }
 
 
@@ -48,9 +79,9 @@ void setup() {
   Serial.begin(9600);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
-  if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
     Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
+    for (;;); // Don't proceed, loop forever
   }
 
   display.display();
@@ -60,11 +91,11 @@ void setup() {
 void loop() {
 
   byte dataBuffer[bufferLength];
-  
+
   Serial.write(startByte);
   Serial.write(bufferLength);
-  
-  
+
+
   dataBuffer[0] = 0x00; // speed byte
 
   int read = analogRead(potentiometerPin);
@@ -77,5 +108,5 @@ void loop() {
   Serial.write(gencrc(dataBuffer, bufferLength));
 
   delay(1);
-  
+
 }
