@@ -29,6 +29,29 @@
 */
 
 
+/**************************************************************************
+  Part of the code is from an example: https://github.com/adafruit/Adafruit_SSD1306/blob/master/examples/ssd1306_128x64_i2c/ssd1306_128x64_i2c.ino
+
+  This is an example for our Monochrome OLEDs based on SSD1306 drivers
+
+  Pick one up today in the adafruit shop!
+  ------> http://www.adafruit.com/category/63_98
+
+  This example is for a 128x64 pixel display using I2C to communicate
+  3 pins are required to interface (two I2C and one reset).
+
+  Adafruit invests time and resources providing this open
+  source code, please support Adafruit and open-source
+  hardware by purchasing products from Adafruit!
+
+  Written by Limor Fried/Ladyada for Adafruit Industries,
+  with contributions from the open source community.
+  BSD license, check license.txt for more information
+  All text above, and the splash screen below must be
+  included in any redistribution.
+ **************************************************************************/
+
+
 /**
    Potentiometer
 
@@ -84,6 +107,13 @@ void setup() {
     for (;;); // Don't proceed, loop forever
   }
 
+  // Show initial display buffer contents on the screen --
+  // the library initializes this with an Adafruit splash screen.
+  display.display();
+  delay(2000); // Pause for 2 seconds
+
+  // Clear the buffer
+  display.clearDisplay();
 
 }
 
@@ -103,19 +133,19 @@ void loop() {
 
 
   display.clearDisplay();
-  
+
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(0,0);
+  display.setCursor(0, 0);
   display.print(F("Velocity: "));
   display.println(read);
-  
-  display.fillRect(0, 20, (read/1023.f)*128, display.height()-40, SSD1306_WHITE);
-  
+
+  display.fillRect(0, 20, (read / 1023.f) * 128, display.height() - 40, SSD1306_WHITE);
+
   display.display();
 
 
-  
+
   dataBuffer[1] = map(read, 0, 1023, 0, 255); // speed value
   //Serial.println(dataBuffer[1]);
 
