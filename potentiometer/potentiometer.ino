@@ -80,6 +80,8 @@ const byte bufferLength = 2;
 
 const int potentiometerPin = A0;
 
+int barX, barY, barWidth, barHeight;
+
 uint8_t gencrc(uint8_t *data, size_t len)
 {
   uint8_t crc = 0;
@@ -115,6 +117,11 @@ void setup() {
   // Clear the buffer
   display.clearDisplay();
 
+  barX = 0;
+  barY = 20;
+  barWidth = display.width();
+  barHeight = display.height() - 40;
+
 }
 
 void loop() {
@@ -140,7 +147,8 @@ void loop() {
   display.print(F("Velocity: "));
   display.println(read);
 
-  display.fillRect(0, 20, (read / 1023.f) * 128, display.height() - 40, SSD1306_WHITE);
+  display.drawRect(barX, barY, barWidth, barHeight, SSD1306_WHITE);
+  display.fillRect(barX + 2, barY + 2, (read / 1023.f) * (barWidth - 4), barHeight - 4, SSD1306_WHITE);
 
   display.display();
 
